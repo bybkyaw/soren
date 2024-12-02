@@ -1,0 +1,22 @@
+.category {
+    position: relative;
+    display: inline-block;       /* Ensures the arrow stays close to the text */
+    font-weight: bold;
+    color: #2A2C24;              /* Default font color */
+    cursor: pointer;
+  }
+  
+  .category:hover {
+    color: #9BB6C7;            /* Change to your desired hover color */
+  }
+  
+  .category:hover::after {
+    content: "←";                /* Use a left arrow */
+    position: absolute;
+    left: calc(100% + 5px);      /* Place the arrow just after the text with a bit of spacing */
+    top: 50%;                    /* Aligns the arrow vertically to the middle */
+    transform: translateY(-50%); /* Center the arrow vertically */
+    font-size: 1.2em;            /* Adjust the size of the arrow if needed */
+    transition: color 0.3s;      /* Smooth transition for color */
+  }
+  

@@ -2,20 +2,176 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@import '~slick-carousel/slick/slick.css';
+@import '~slick-carousel/slick/slick-theme.css';
+
+.button-primary {
+  @apply bg-transparent text-accent-moonstone font-semibold py-2 px-4 rounded hover:bg-accent-moonstone transition;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer utilities {
+  .text-textPrimary {
+    @apply text-accent-af_white;
+  }
+
+  .bg-background {
+    @apply bg-primary;
   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif;
+}
+
+/* User Page Styles */
+.user-page {
+  @apply bg-accent-af_white text-black; /* White background with black text for User */
+}
+
+/* Admin Page Styles */
+.admin-page {
+  @apply bg-accent-black_olive text-accent-moonstone; /* Black background with white text for Admin */
+}
+
+/* Keen Slider */
+.keen-slider {
+  transition: transform 1s ease-in-out; /* Adjust the duration for smoother transitions */
+}
+
+.keen-slider__slide {
+  position: relative; /* Ensures slides stack correctly */
+  overflow: hidden; /* Ensures images don't overflow */
+}
+
+/* Best Selling Books */
+.best-selling-books-section {
+  padding: 0 1rem;
+}
+
+.book-item h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.book-item p {
+  color: #2A2C24;
+}
+
+.book-item .text-blue-600 {
+  color: #F3F6F6;
+}
+
+/* Left Panel (1/4 width) */
+.left-panel {
+  @apply w-1/4 bg-accent-raisin_black p-6 flex justify-center items-center text-center border-r border-gray-300;
+}
+
+/* Right Panel (3/4 width) */
+.right-panel {
+  @apply w-3/4 bg-accent-raisin_black p-6 flex justify-center items-center text-center;
+}
+
+/* Page Container */
+.page-container {
+  @apply flex h-screen; /* Full viewport height */
+}
+
+
+
+
+
+/* Modal Animation */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+
+
+/* Loading Animation */
+
+/* Add Spinner Animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+
+/* Dropdown Menu Styling */
+.user-profile-dropdown {
+  animation: dropdown-slide 0.2s ease-out;
+}
+
+@keyframes dropdown-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-profile-dropdown button:hover,
+.user-profile-dropdown a:hover {
+  background-color: #f0f0f0; /* Light gray hover effect */
+}
+
+
+/* Optional: Style for the Navbar logo */
+nav img {
+  object-fit: contain;
+}
+
+/* Optional: Style for Search Bar */
+nav input {
+  transition: border-color 0.2s ease-in-out;
+}
+
+nav input:focus {
+  border-color: #2a9d8f;
+}
+
+
+
+
+
+
+/* Add this CSS to your component's CSS file or global styles */
+
+::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.1); /* Semi-transparent thumb */
+  border-radius: 10px; /* Rounded edges for the thumb */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Transparent track */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3); /* Darker thumb on hover */
 }
