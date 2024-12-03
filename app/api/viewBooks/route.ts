@@ -24,19 +24,26 @@ export async function POST(req: Request) {
     let whereClause = {};
 
     if (filter !== 'all') {
-      if (filter === 'stock') {
-        // Handle stock filtering
+      if (filter === 'stock' || filter === 'price') {
+        // Ensure the value is parsed correctly for numeric fields
+        const numericValue = parseFloat(value as string);
+        if (isNaN(numericValue)) {
+          return NextResponse.json(
+            { message: "Invalid value for numeric field.", books: [] },
+            { status: 400 }
+          );
+        }
+
+        // Handle stock or price filtering with operators
+        const field = filter; // Can be 'stock' or 'price'
         whereClause =
           operator === 'less'
-            ? { stock: { lt: value as number } }
+            ? { [field]: { lt: numericValue } }
             : operator === 'greater'
-            ? { stock: { gt: value as number } }
+            ? { [field]: { gt: numericValue } }
             : operator === 'equal'
-            ? { stock: { equals: value as number } }
+            ? { [field]: { equals: numericValue } }
             : {};
-      } else if (filter === 'price') {
-        // Handle price filtering
-        whereClause = { price: parseFloat(value as string) };
       } else {
         // Handle other filters (author, title, genre)
         whereClause = { [filter]: value };
@@ -65,6 +72,74 @@ export async function POST(req: Request) {
     );
   }
 }
+
+
+
+
+// import { NextResponse } from "next/server";
+// import { PrismaClient } from "@prisma/client";
+
+// const prisma = new PrismaClient();
+
+// interface RequestBody {
+//   filter: 'all' | 'author' | 'title' | 'genre' | 'price' | 'stock';
+//   value?: string | number;
+//   operator?: 'less' | 'greater' | 'equal'; 
+// }
+
+// export async function POST(req: Request) {
+//   try {
+//     const { filter, value, operator }: RequestBody = await req.json();
+
+// // Validate input
+//     if (!filter) {
+//       return NextResponse.json(
+//         { message: "Filter is required.", books: [] },
+//         { status: 400 }
+//       );
+//     }
+
+//     let whereClause = {};
+
+//     if (filter !== 'all') {
+//       if (filter === 'stock' || filter  === 'price') {
+        
+//         const field = filter;
+// // Handle stock filtering
+//         whereClause =
+//           operator === 'less'
+//             ? { [field]: { lt: value as number } }: operator === 'greater'
+//             ? { [field]: { gt: value as number } }: operator === 'equal'
+//             ? { [field]: { equals: value as number } }: {};
+//       } else {
+//         // Handle other filters (author, title, genre)
+//         whereClause = { [filter]: value };
+//       }
+//     }
+
+//     // Fetch books from database
+//     const books = await prisma.book.findMany({
+//       where: filter === 'all' ? undefined : whereClause,
+//     });
+
+//     // Handle no books found
+//     if (books.length === 0) {
+//       return NextResponse.json(
+//         { message: "No books found for the given query.", books: [] },
+//         { status: 404 }
+//       );
+//     }
+
+
+//     return NextResponse.json({ books });
+//   } catch (error) {
+//     console.error("Error fetching books:", error);
+//     return NextResponse.json(
+//       { message: "Failed to fetch books. Please try again later.", books: [] },
+//       { status: 500 }
+//     );
+//   }
+// }
 
 
 
