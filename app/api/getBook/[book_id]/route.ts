@@ -39,4 +39,3 @@ export async function GET(request: Request, { params }: { params: { book_id: str
     await prisma.$disconnect();
   }
 }
-

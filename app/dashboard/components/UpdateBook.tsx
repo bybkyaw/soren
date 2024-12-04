@@ -1,108 +1,145 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface Book {
   book_id: number;
   title: string;
   author: string;
   genre?: string;
+  isbn?: string;
   price: number;
   stock: number;
+  image?: string; // Base64 image string
 }
 
 interface UpdateBookProps {
-  book: Book | null;
+  book: Book;
   isVisible: boolean;
   onClose: () => void;
-  onSave: (updatedBook: Book) => void;
+  onUpdate: (updatedBook: Book) => void;
 }
 
-const UpdateBook: React.FC<UpdateBookProps> = ({ book, isVisible, onClose, onSave }) => {
-  const [formData, setFormData] = useState<Book | null>(book);
+const UpdateBook: React.FC<UpdateBookProps> = ({
+  book,
+  isVisible,
+  onClose,
+  onUpdate,
+}) => {
+  const [updatedBook, setUpdatedBook] = useState<Book>(book);
+  const [previewImage, setPreviewImage] = useState<string | undefined>(book.image);
 
-  if (!isVisible || !formData) return null;
+  useEffect(() => {
+    setUpdatedBook(book);
+    setPreviewImage(book.image);
+  }, [book]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prevData) => prevData && { ...prevData, [name]: value });
+    setUpdatedBook((prev) => ({
+      ...prev,
+      [name]: name === 'price' || name === 'stock' ? parseFloat(value) : value,
+    }));
   };
 
-  const handleSave = () => {
-    if (formData) {
-      onSave(formData);
-      onClose();
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setPreviewImage(reader.result as string);
+        setUpdatedBook((prev) => ({
+          ...prev,
+          image: reader.result as string, // Store Base64 string in the state
+        }));
+      };
+      reader.readAsDataURL(file);
     }
   };
+
+  const handleSubmit = () => {
+    onUpdate(updatedBook);
+    onClose();
+  };
+
+  if (!isVisible) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-        <h3 className="text-lg font-semibold text-accent-moonstone mb-4">Update Book</h3>
-        <div className="flex flex-col gap-4">
-          <label>
-            Title:
+        <h3 className="text-lg font-semibold mb-4">Update Book</h3>
+        <form className="space-y-4">
+          <input
+            type="text"
+            name="title"
+            value={updatedBook.title}
+            onChange={handleInputChange}
+            className="w-full border border-gray-300 rounded p-2"
+            placeholder="Title"
+          />
+          <input
+            type="text"
+            name="author"
+            value={updatedBook.author}
+            onChange={handleInputChange}
+            className="w-full border border-gray-300 rounded p-2"
+            placeholder="Author"
+          />
+          <input
+            type="text"
+            name="genre"
+            value={updatedBook.genre || ''}
+            onChange={handleInputChange}
+            className="w-full border border-gray-300 rounded p-2"
+            placeholder="Genre"
+          />
+          <input
+            type="number"
+            name="price"
+            value={updatedBook.price}
+            onChange={handleInputChange}
+            className="w-full border border-gray-300 rounded p-2"
+            placeholder="Price"
+          />
+          <input
+            type="number"
+            name="stock"
+            value={updatedBook.stock}
+            onChange={handleInputChange}
+            className="w-full border border-gray-300 rounded p-2"
+            placeholder="Stock"
+          />
+          <div>
+            <label className="block text-sm mb-2">Book Cover Image:</label>
             <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              className="p-2 border border-gray-300 rounded w-full"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="block w-full text-sm text-gray-500 border border-gray-300 rounded p-2"
             />
-          </label>
-          <label>
-            Author:
-            <input
-              type="text"
-              name="author"
-              value={formData.author}
-              onChange={handleInputChange}
-              className="p-2 border border-gray-300 rounded w-full"
-            />
-          </label>
-          <label>
-            Genre:
-            <input
-              type="text"
-              name="genre"
-              value={formData.genre || ''}
-              onChange={handleInputChange}
-              className="p-2 border border-gray-300 rounded w-full"
-            />
-          </label>
-          <label>
-            Price:
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleInputChange}
-              className="p-2 border border-gray-300 rounded w-full"
-            />
-          </label>
-          <label>
-            Stock:
-            <input
-              type="number"
-              name="stock"
-              value={formData.stock}
-              onChange={handleInputChange}
-              className="p-2 border border-gray-300 rounded w-full"
-            />
-          </label>
-        </div>
-        <div className="flex justify-end gap-4 mt-6">
+            {previewImage && (
+              <div className="mt-4">
+                <img
+                  src={previewImage}
+                  alt="Book Cover Preview"
+                  className="w-full h-40 object-contain border border-gray-300 rounded"
+                />
+              </div>
+            )}
+          </div>
+        </form>
+        <div className="flex justify-end mt-4">
           <button
             onClick={onClose}
-            className="py-2 px-4 rounded bg-gray-300 text-gray-800 hover:bg-gray-400"
+            className="py-2 px-4 bg-gray-300 rounded hover:bg-gray-400 mr-2"
           >
             Cancel
           </button>
           <button
-            onClick={handleSave}
-            className="py-2 px-4 rounded bg-accent-moonstone text-white hover:bg-accent-minBlue"
+            onClick={handleSubmit}
+            className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
-            Save
+            Update
           </button>
         </div>
       </div>
@@ -113,53 +150,51 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, isVisible, onClose, onSav
 export default UpdateBook;
 
 
-
-
 // 'use client';
 
-// import React, { useState } from 'react';
+// import React, { useState, useEffect } from 'react';
 
 // interface Book {
 //   book_id: number;
 //   title: string;
 //   author: string;
 //   genre?: string;
+//   isbn?: string;
 //   price: number;
 //   stock: number;
+//   image?: string; // Base64 image string
 // }
 
 // interface UpdateBookProps {
 //   book: Book;
 //   isVisible: boolean;
 //   onClose: () => void;
-//   onSave: (updatedBook: Book) => void;
+//   onUpdate: (updatedBook: Book) => void;
 // }
 
-// const UpdateBook: React.FC<UpdateBookProps> = ({ book, isVisible, onClose, onSave }) => {
-//   const [formData, setFormData] = useState<Book>(book);
+// const UpdateBook: React.FC<UpdateBookProps> = ({
+//   book,
+//   isVisible,
+//   onClose,
+//   onUpdate,
+// }) => {
+//   const [updatedBook, setUpdatedBook] = useState<Book>(book);
 
-//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+//   useEffect(() => {
+//     setUpdatedBook(book);
+//   }, [book]);
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 //     const { name, value } = e.target;
-//     setFormData((prevData) => ({ ...prevData, [name]: value }));
+//     setUpdatedBook((prev) => ({
+//       ...prev,
+//       [name]: name === 'price' || name === 'stock' ? parseFloat(value) : value,
+//     }));
 //   };
 
-//   const handleSave = async () => {
-//     try {
-//       const response = await fetch(`/api/updateBook/${formData.book_id}`, {
-//         method: 'PUT',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify(formData),
-//       });
-//       if (response.ok) {
-//         const updatedBook = await response.json();
-//         onSave(updatedBook); // Update the book in the parent component
-//         onClose(); // Close the modal
-//       } else {
-//         console.error('Failed to update the book.');
-//       }
-//     } catch (error) {
-//       console.error('Error updating book:', error);
-//     }
+//   const handleSubmit = () => {
+//     onUpdate(updatedBook);
+//     onClose();
 //   };
 
 //   if (!isVisible) return null;
@@ -167,186 +202,61 @@ export default UpdateBook;
 //   return (
 //     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
 //       <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-//         <h3 className="text-lg font-semibold text-accent-moonstone mb-4">Update Book</h3>
-//         <div className="flex flex-col gap-4">
-//           <label>
-//             Title:
-//             <input
-//               type="text"
-//               name="title"
-//               value={formData.title}
-//               onChange={handleInputChange}
-//               className="p-2 border border-gray-300 rounded w-full"
-//             />
-//           </label>
-//           <label>
-//             Author:
-//             <input
-//               type="text"
-//               name="author"
-//               value={formData.author}
-//               onChange={handleInputChange}
-//               className="p-2 border border-gray-300 rounded w-full"
-//             />
-//           </label>
-//           <label>
-//             Genre:
-//             <input
-//               type="text"
-//               name="genre"
-//               value={formData.genre || ''}
-//               onChange={handleInputChange}
-//               className="p-2 border border-gray-300 rounded w-full"
-//             />
-//           </label>
-//           <label>
-//             Price:
-//             <input
-//               type="number"
-//               name="price"
-//               value={formData.price}
-//               onChange={handleInputChange}
-//               className="p-2 border border-gray-300 rounded w-full"
-//             />
-//           </label>
-//           <label>
-//             Stock:
-//             <input
-//               type="number"
-//               name="stock"
-//               value={formData.stock}
-//               onChange={handleInputChange}
-//               className="p-2 border border-gray-300 rounded w-full"
-//             />
-//           </label>
-//         </div>
-//         <div className="flex justify-end gap-4 mt-6">
+//         <h3 className="text-lg font-semibold mb-4">Update Book</h3>
+//         <form className="space-y-4">
+//           <input
+//             type="text"
+//             name="title"
+//             value={updatedBook.title}
+//             onChange={handleInputChange}
+//             className="w-full border border-gray-300 rounded p-2"
+//             placeholder="Title"
+//           />
+//           <input
+//             type="text"
+//             name="author"
+//             value={updatedBook.author}
+//             onChange={handleInputChange}
+//             className="w-full border border-gray-300 rounded p-2"
+//             placeholder="Author"
+//           />
+//           <input
+//             type="text"
+//             name="genre"
+//             value={updatedBook.genre || ''}
+//             onChange={handleInputChange}
+//             className="w-full border border-gray-300 rounded p-2"
+//             placeholder="Genre"
+//           />
+//           <input
+//             type="number"
+//             name="price"
+//             value={updatedBook.price}
+//             onChange={handleInputChange}
+//             className="w-full border border-gray-300 rounded p-2"
+//             placeholder="Price"
+//           />
+//           <input
+//             type="number"
+//             name="stock"
+//             value={updatedBook.stock}
+//             onChange={handleInputChange}
+//             className="w-full border border-gray-300 rounded p-2"
+//             placeholder="Stock"
+//           />
+//         </form>
+//         <div className="flex justify-end mt-4">
 //           <button
 //             onClick={onClose}
-//             className="py-2 px-4 rounded bg-gray-300 text-gray-800 hover:bg-gray-400"
+//             className="py-2 px-4 bg-gray-300 rounded hover:bg-gray-400 mr-2"
 //           >
 //             Cancel
 //           </button>
 //           <button
-//             onClick={handleSave}
-//             className="py-2 px-4 rounded bg-accent-moonstone text-white hover:bg-accent-minBlue"
+//             onClick={handleSubmit}
+//             className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
 //           >
-//             Save
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default UpdateBook;
-
-
-// 'use client';
-
-// import React, { useState } from 'react';
-
-// interface Book {
-//   book_id: number;
-//   title: string;
-//   author: string;
-//   genre?: string;
-//   price: number;
-//   stock: number;
-// }
-
-// interface UpdateBookProps {
-//   book: Book | null;
-//   isVisible: boolean;
-//   onClose: () => void;
-//   onSave: (updatedBook: Book) => void;
-// }
-
-// const UpdateBook: React.FC<UpdateBookProps> = ({ book, isVisible, onClose, onSave }) => {
-//   const [formData, setFormData] = useState<Book | null>(book);
-
-//   if (!isVisible || !formData) return null;
-
-//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-//     const { name, value } = e.target;
-//     setFormData((prevData) => prevData && { ...prevData, [name]: value });
-//   };
-
-//   const handleSave = () => {
-//     if (formData) {
-//       onSave(formData);
-//       onClose();
-//     }
-//   };
-
-//   return (
-//     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-//       <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-//         <h3 className="text-lg font-semibold text-accent-moonstone mb-4">Update Book</h3>
-//         <div className="flex flex-col gap-4">
-//           <label>
-//             Title:
-//             <input
-//               type="text"
-//               name="title"
-//               value={formData.title}
-//               onChange={handleInputChange}
-//               className="p-2 border border-gray-300 rounded w-full"
-//             />
-//           </label>
-//           <label>
-//             Author:
-//             <input
-//               type="text"
-//               name="author"
-//               value={formData.author}
-//               onChange={handleInputChange}
-//               className="p-2 border border-gray-300 rounded w-full"
-//             />
-//           </label>
-//           <label>
-//             Genre:
-//             <input
-//               type="text"
-//               name="genre"
-//               value={formData.genre || ''}
-//               onChange={handleInputChange}
-//               className="p-2 border border-gray-300 rounded w-full"
-//             />
-//           </label>
-//           <label>
-//             Price:
-//             <input
-//               type="number"
-//               name="price"
-//               value={formData.price}
-//               onChange={handleInputChange}
-//               className="p-2 border border-gray-300 rounded w-full"
-//             />
-//           </label>
-//           <label>
-//             Stock:
-//             <input
-//               type="number"
-//               name="stock"
-//               value={formData.stock}
-//               onChange={handleInputChange}
-//               className="p-2 border border-gray-300 rounded w-full"
-//             />
-//           </label>
-//         </div>
-//         <div className="flex justify-end gap-4 mt-6">
-//           <button
-//             onClick={onClose}
-//             className="py-2 px-4 rounded bg-gray-300 text-gray-800 hover:bg-gray-400"
-//           >
-//             Cancel
-//           </button>
-//           <button
-//             onClick={handleSave}
-//             className="py-2 px-4 rounded bg-accent-moonstone text-white hover:bg-accent-minBlue"
-//           >
-//             Save
+//             Update
 //           </button>
 //         </div>
 //       </div>
