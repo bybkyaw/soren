@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import AddBookForm from './components/AddBookForm'; // Adjust the path if needed
 import RemoveBookForm from './components/RemoveBookForm'; // Adjust the path if needed
 import ViewBook from './components/ViewBook';
-import ManageBooks from './components/ManageBooks';
+
 
 const Page = () => {
   const [selectedPage, setSelectedPage] = useState< 'home' | 'add' | 'remove' | 'view' | 'orders' | 'manage' | null>(null);
@@ -39,16 +39,16 @@ const Page = () => {
         </div>
       );
 
-      case 'manage':
-      return <ManageBooks />
+      // case 'manage':
+      // return <ManageBooks />
 
-      default:
-        return (
-          <div>
-            {/* <h1 className="text-accent-moonstone">Soren</h1> */}
-            <img src="/logo/soren_lgt.png" alt="Logo" className="h-48 w-48 object-contain" />
-          </div>
-        );
+      // default:
+      //   return (
+      //     <div>
+      //       {/* <h1 className="text-accent-moonstone">Soren</h1> */}
+      //       <img src="/logo/soren_lgt.png" alt="Logo" className="h-48 w-48 object-contain" />
+      //     </div>
+      //   );
     }
   };
 

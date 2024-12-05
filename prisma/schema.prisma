@@ -35,6 +35,8 @@ model Book {
   price      Float
   stock      Int             @default(0)
   image      Bytes?
+  sales      Int             @default(0) // Track sales count
+  isBestSelling Boolean      @default(false) // Flag for best-selling books
 
   orderItems OrderItem[]
   reviews    Review[]
