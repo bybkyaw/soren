@@ -87,7 +87,7 @@ const ViewBookRight: React.FC<ViewBookRightProps> = ({
         onClick={handleManageBooks}
         className="mt-3 py-2 px-4 rounded-lg bg-accent-moonstone text-white hover:bg-accent-minBlue transition w-full"
       >
-        Manage Books
+        View BSB Section
       </button>
 
       {selectedBook && (
