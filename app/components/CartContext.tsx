@@ -31,7 +31,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             : cartItem
         );
       }
-      return [...prev, item];
+      return [...prev, { ...item, price: Number(item.price) }]; // Ensure price is a number
     });
   };
 
@@ -50,10 +50,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-// Custom hook to use the CartContext
 export const useCart = (): CartContextType => {
   const context = useContext(CartContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useCart must be used within a CartProvider');
   }
   return context;
