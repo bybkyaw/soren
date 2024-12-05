@@ -9,8 +9,10 @@ interface Book {
   title: string;
   author: string;
   genre?: string;
+  isbn: string;
   price: number;
   stock: number;
+  isBestSelling?: boolean;
   imageUrl?: string; // URL of the book image
 }
 
@@ -84,27 +86,62 @@ const ViewBookLeft: React.FC<ViewBookLeftProps> = ({
     if (event.key === 'Enter') handleView();
   };
 
-  //const handleRowClick = (book: Book) => setSelectedBook(book);
   const handleRowClick = async (book: Book) => {
     try {
       const response = await fetch(`/api/getBook/${book.book_id}`);
       const data = await response.json();
-  
+
       if (!response.ok) {
         alert('Failed to fetch book details');
         return;
       }
-  
+
       setSelectedBook(data);
     } catch (error) {
       console.error('Error fetching book details:', error);
       alert('An error occurred while fetching book details.');
     }
-  };  
+  };
+
+  const handleCheckboxChange = async (book: Book, isChecked: boolean) => {
+    try {
+      const payload = {
+        bookId: book.book_id,
+        isBestSelling: isChecked,
+      };
+
+      console.log("Payload being sent:", payload); // Debugging
+
+      const response = await fetch('/api/bestSellingBooks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        console.error("Error from server:", result.message);
+        setAlertMessage(result.message || 'Failed to update Best Selling Book status.');
+        setIsAlertVisible(true);
+      } else {
+        console.log("Book updated successfully:", result.book);
+        setBooks((prevBooks) =>
+          prevBooks.map((b) =>
+            b.book_id === book.book_id ? { ...b, isBestSelling: isChecked } : b
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating Best Selling Book status:", error);
+      setAlertMessage('An unexpected error occurred.');
+      setIsAlertVisible(true);
+    }
+  };
 
   return (
     <div className="p-6 flex flex-col h-full min-w-[900px] max-w-[900px]">
-      <h3 className="text-lg font-semibold text-accent-moonstone mb-4">View Books</h3>
+      <h3 className="text-lg font-semibold text-accent-moonstone mb-4">Manage Books</h3>
 
       {/* View Options */}
       <div className="flex gap-4 mb-4 mr-11 justify-center">
@@ -174,42 +211,42 @@ const ViewBookLeft: React.FC<ViewBookLeftProps> = ({
                 <th className="border border-gray-300 p-2 w-[80px]">ID</th>
                 <th className="border border-gray-300 p-2 w-[250px]">Title</th>
                 <th className="border border-gray-300 p-2 w-[200px]">Author</th>
+                <th className="border border-gray-300 p-2 w-[200px]">ISBN</th>
                 <th className="border border-gray-300 p-2 w-[150px]">Genre</th>
                 <th className="border border-gray-300 p-2 w-[100px]">Price</th>
                 <th className="border border-gray-300 p-2 w-[100px]">Stock</th>
+                <th className="border border-gray-300 p-2 w-[50px]">BSB</th>
               </tr>
             </thead>
             <tbody>
-                {books.map((book) => (
-                    <tr
-                    key={book.book_id}
-                    className={`cursor-pointer ${
-                        selectedBook?.book_id === book.book_id
-                        ? 'bg-accent-minBlue border-l-4 border-blue-500'
-                        : 'hover:bg-accent-oxford_blue'
-                    }`}
-                    onClick={() => handleRowClick(book)}
-                    style={{ height: '40px' }} // Consistent row height
-                    >
-                    <td className="border border-gray-300 p-2 text-left">{book.book_id}</td>
-                    <td className="border border-gray-300 p-2 text-left">{book.title}</td>
-                    <td className="border border-gray-300 p-2 text-left">{book.author}</td>
-                    <td className="border border-gray-300 p-2 text-left">{book.genre || 'N/A'}</td>
-                    <td className="border border-gray-300 p-2 text-left">${book.price.toFixed(2)}</td>
-                    <td className="border border-gray-300 p-2 text-right">{book.stock}</td>
-                    </tr>
-                ))}
-                {/* Empty Rows to Fill Space for 10 Rows */}
-                {books.length < 10 &&
-                    Array.from({ length: 10 - books.length }).map((_, idx) => (
-                    <tr key={`empty-${idx}`} style={{ height: '40px' }}>
-                        <td colSpan={6} className="border border-gray-300 text-center text-gray-400">
-                        {idx === 0 ? 'No additional data' : ''}
-                        </td>
-                    </tr>
-                    ))}
+              {books.map((book) => (
+                <tr
+                  key={book.book_id}
+                  className={`cursor-pointer ${
+                    selectedBook?.book_id === book.book_id
+                      ? 'bg-accent-minBlue border-l-4 border-blue-500'
+                      : 'hover:bg-accent-oxford_blue'
+                  }`}
+                  onClick={() => handleRowClick(book)}
+                  style={{ height: '40px' }}
+                >
+                  <td className="border border-gray-300 p-2 text-left">{book.book_id}</td>
+                  <td className="border border-gray-300 p-2 text-left">{book.title}</td>
+                  <td className="border border-gray-300 p-2 text-left">{book.author}</td>
+                  <td className="border border-gray-300 p-2 text-left">{book.isbn}</td>
+                  <td className="border border-gray-300 p-2 text-left">{book.genre || 'N/A'}</td>
+                  <td className="border border-gray-300 p-2 text-left">${book.price.toFixed(2)}</td>
+                  <td className="border border-gray-300 p-2 text-right">{book.stock}</td>
+                  <td className="border border-gray-300 p-2 text-center">
+                    <input
+                      type="checkbox"
+                      checked={book.isBestSelling || false}
+                      onChange={(e) => handleCheckboxChange(book, e.target.checked)}
+                    />
+                  </td>
+                </tr>
+              ))}
             </tbody>
-
           </table>
         )}
       </div>
@@ -224,5 +261,4 @@ const ViewBookLeft: React.FC<ViewBookLeftProps> = ({
 };
 
 export default ViewBookLeft;
-
 

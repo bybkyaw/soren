@@ -82,7 +82,7 @@ const Page = () => {
           className="text-accent-moonstone py-2 px-4 rounded font-semibold bg-transparent hover:border hover:border-accent-moonstone transition"
           onClick={() => setSelectedPage('view')}
         >
-          View Books
+          Manage Books
         </button>
         <button
           className="text-accent-moonstone py-2 px-4 rounded font-semibold bg-transparent hover:border hover:border-accent-moonstone transition"
@@ -90,12 +90,12 @@ const Page = () => {
         >
           Customer Orders 
         </button>
-        <button
+        {/* <button
           className="text-accent-moonstone py-2 px-4 rounded font-semibold bg-transparent hover:border hover:border-accent-moonstone transition"
           onClick={() => setSelectedPage('manage')}
         >
           Manage Books
-        </button>
+        </button> */}
       </div>
 
 {/* Right Panel */}
