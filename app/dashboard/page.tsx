@@ -39,16 +39,7 @@ const Page = () => {
         </div>
       );
 
-      // case 'manage':
-      // return <ManageBooks />
-
-      // default:
-      //   return (
-      //     <div>
-      //       {/* <h1 className="text-accent-moonstone">Soren</h1> */}
-      //       <img src="/logo/soren_lgt.png" alt="Logo" className="h-48 w-48 object-contain" />
-      //     </div>
-      //   );
+      
     }
   };
 

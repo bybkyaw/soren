@@ -1,3 +1,4 @@
+// /app/thank-you/page.tsx
 'use client';
 
 import React from 'react';
@@ -10,7 +11,7 @@ const ThankYou: React.FC = () => {
     <div className="thank-you-page min-h-screen flex flex-col items-center justify-center">
       <h1 className="text-4xl font-bold text-accent-moonstone mb-4">Thank You!</h1>
       <p className="text-lg text-gray-700 mb-8">
-        Your order has been placed successfully. You will receive a confirmation soon.
+        Your order has been placed successfully. You will receive an email confirmation soon.
       </p>
       <button
         onClick={() => router.push('/')}

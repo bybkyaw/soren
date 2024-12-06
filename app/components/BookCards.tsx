@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
+import Button from './Button';
 import { useCart } from './CartContext';
 
 interface BookCardProps {
@@ -18,30 +20,33 @@ const BookCard: React.FC<BookCardProps> = ({
   price,
   id,
 }) => {
-  const { addToCart } = useCart(); // Access the addToCart function from the CartContext
+  const { addToCart } = useCart();
 
   return (
-    <div className="book-card bg-white shadow-md rounded-lg overflow-hidden flex flex-col items-center p-4 w-56 h-96">
+    <div className="book-card bg-white shadow-md rounded-lg overflow-hidden flex flex-col items-center p-4 w-52">
       {/* Book Image */}
-      <div className="w-full h-40 flex justify-center items-center mb-4">
+      <div className="w-full h-60 flex justify-center items-center mb-4">
         {imageUrl ? (
-          <img
+          <Image
             src={imageUrl}
             alt={`Cover of ${title}`}
-            className="w-full h-full object-cover rounded-md"
+            width={150}
+            height={240}
+            className="object-cover rounded-lg"
           />
         ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
             <span className="text-sm text-gray-600">No Image Available</span>
           </div>
         )}
       </div>
 
       {/* Book Details */}
-      <div className="text-center flex flex-col justify-between flex-grow w-full">
-        <div>
+      <div className="flex flex-col items-center flex-grow justify-between w-full">
+        {/* Title and Author */}
+        <div className="text-center">
           <h3
-            className="text-lg font-semibold text-accent-black_olive mb-1 truncate"
+            className="text-base font-semibold text-accent-black_olive mb-1 truncate"
             title={title}
           >
             {title}
@@ -53,8 +58,14 @@ const BookCard: React.FC<BookCardProps> = ({
             by {author}
           </p>
         </div>
-        <p className="text-xl text-amber-500 font-semibold mb-4">{price}</p>
-        <button
+
+        {/* Price */}
+        <p className="text-lg text-amber-500 font-semibold mb-4">{price}</p>
+      </div>
+
+      {/* Quick Add Button */}
+      <div className="mt-auto w-full">
+        <Button
           onClick={() =>
             addToCart({
               id,
@@ -63,90 +74,14 @@ const BookCard: React.FC<BookCardProps> = ({
               quantity: 1,
             })
           }
-          className="w-full bg-accent-moonstone text-white py-2 px-4 rounded-lg hover:bg-accent-minBlue transition"
-        >
-          Quick Add
-        </button>
+          label="Quick Add"
+          className="w-full"
+        />
       </div>
     </div>
   );
 };
 
 export default BookCard;
-
-
-// 'use client';
-
-// import React from 'react';
-// import { useCart } from './CartContext';
-
-// interface BookCardProps {
-//   imageUrl: string;
-//   title: string;
-//   author: string;
-//   price: string;
-//   id: string;
-// }
-
-// const BookCard: React.FC<BookCardProps> = ({
-//   imageUrl,
-//   title,
-//   author,
-//   price,
-//   id,
-// }) => {
-//   const { addToCart } = useCart(); // Access the addToCart function from the CartContext
-
-//   return (
-//     <div className="book-card bg-white shadow-md rounded-lg overflow-hidden flex flex-col items-center p-4 w-48">
-//       {/* Book Image */}
-//       <div className="w-full h-60 flex justify-center items-center mb-4">
-//         {imageUrl ? (
-//           <img
-//             src={imageUrl}
-//             alt={`Cover of ${title}`}
-//             className="w-full h-full object-cover rounded-lg"
-//           />
-//         ) : (
-//           <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-//             <span className="text-sm text-gray-600">No Image Available</span>
-//           </div>
-//         )}
-//       </div>
-
-//       {/* Book Details */}
-//       <div className="text-center">
-//         <h3
-//           className="text-lg font-semibold text-accent-black_olive mb-2 truncate"
-//           title={title}
-//         >
-//           {title}
-//         </h3>
-//         <p
-//           className="text-sm text-gray-700 font-medium mb-2 truncate"
-//           title={author}
-//         >
-//           by {author}
-//         </p>
-//         <p className="text-xl text-amber-500 font-semibold mb-4">{price}</p>
-//         <button
-//           onClick={() =>
-//             addToCart({
-//               id,
-//               title,
-//               price: parseFloat(price),
-//               quantity: 1,
-//             })
-//           }
-//           className="w-full bg-accent-moonstone text-white py-2 px-4 rounded-lg hover:bg-accent-minBlue transition"
-//         >
-//           Quick Add
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default BookCard;
 
 
